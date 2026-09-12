@@ -1,0 +1,12 @@
+node_modules/
+dist/
+build/
+.env
+.env.local
+*.local
+server/.data/
+serviceAccountKey.json
+*-firebase-adminsdk-*.json
+.DS_Store
+Thumbs.db
+npm-debug.log*

@@ -1,0 +1,67 @@
+@import 'tailwindcss';
+
+/*
+  VitalQR design tokens.
+
+  The scan page is read in daylight, on an unfamiliar phone, by someone with
+  adrenaline in their system. So: large type, heavy weights, and severity
+  carried by an icon and a text label as well as colour, never colour alone.
+*/
+@theme {
+  --color-brand-50: #fff1f2;
+  --color-brand-100: #ffe4e6;
+  --color-brand-200: #fecdd3;
+  --color-brand-500: #f43f5e;
+  --color-brand-600: #e11d48;
+  --color-brand-700: #be123c;
+  --color-brand-900: #881337;
+
+  --color-ink: #0f172a;
+  --color-muted: #64748b;
+
+  --font-sans: 'Inter', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+  background-color: #f8fafc;
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Printed fallback card: the offline answer from the Safety slide.
+   Everything but the card itself is dropped from the page. */
+@media print {
+  .no-print {
+    display: none !important;
+  }
+  body {
+    background: #fff;
+  }
+  .print-card {
+    box-shadow: none !important;
+    border: 1.5px solid #0f172a !important;
+    break-inside: avoid;
+  }
+}
+
+@keyframes pulse-ring {
+  0% {
+    box-shadow: 0 0 0 0 rgb(225 29 72 / 0.45);
+  }
+  70% {
+    box-shadow: 0 0 0 14px rgb(225 29 72 / 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgb(225 29 72 / 0);
+  }
+}
+
+.pulse-ring {
+  animation: pulse-ring 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}

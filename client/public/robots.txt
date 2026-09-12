@@ -1,0 +1,10 @@
+# Emergency profile pages carry medical data behind an unguessable id.
+# They must never be crawled, cached or indexed by anyone.
+User-agent: *
+Disallow: /s/
+Disallow: /dashboard
+Disallow: /profile
+Disallow: /qr
+
+# The public pages are the pitch; let them be found.
+Allow: /

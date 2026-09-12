@@ -1,0 +1,79 @@
+# Render blueprint for the VitalQR API.
+#
+# Render > New > Blueprint, point it at this repo, and it reads this file.
+# Everything marked `sync: false` is left blank on purpose and must be filled
+# in the Render dashboard, because it is either a secret or a URL that does
+# not exist until the frontend is deployed.
+#
+# Order matters: deploy this service first to get its URL, deploy the client
+# to Vercel with that URL, then come back and set PUBLIC_APP_URL and
+# CORS_ORIGINS to the Vercel domain. See DEPLOY.md.
+
+services:
+  - type: web
+    name: vitalqr-api
+    runtime: node
+    plan: free
+    region: singapore
+    rootDir: server
+    buildCommand: npm ci
+    startCommand: npm start
+
+    # Render restarts the service if this stops returning 2xx.
+    healthCheckPath: /api/health
+
+    envVars:
+      - key: NODE_ENV
+        value: production
+
+      # Render injects PORT itself; src/config/env.js reads it.
+
+      # --- storage ------------------------------------------------------
+      # Must be firestore in production. The `memory` store writes to a file
+      # on local disk, and Render's filesystem is ephemeral: every deploy or
+      # restart would silently wipe every profile.
+      - key: DATA_STORE
+        value: firestore
+
+      - key: AUTH_MODE
+        value: firebase
+
+      # --- secrets (set these in the dashboard) --------------------------
+      # Paste the entire service account JSON from
+      # Firebase Console > Project settings > Service accounts.
+      # Base64-encode it first if the dashboard mangles the newlines.
+      - key: FIREBASE_SERVICE_ACCOUNT_JSON
+        sync: false
+
+      - key: FIREBASE_PROJECT_ID
+        sync: false
+
+      # Unused while AUTH_MODE=firebase, but generated so a fallback to
+      # AUTH_MODE=local can never run on the insecure development default.
+      - key: JWT_SECRET
+        generateValue: true
+
+      # --- URLs (fill in after the Vercel deploy) -----------------------
+      # PUBLIC_APP_URL is encoded into every QR code. If this is wrong,
+      # every printed code points somewhere that does not exist.
+      - key: PUBLIC_APP_URL
+        sync: false
+
+      - key: CORS_ORIGINS
+        sync: false
+
+      # --- OTP ----------------------------------------------------------
+      # `console` prints codes to the Render log instead of sending SMS.
+      # Switch to `twilio` and fill the three values below to send real SMS.
+      - key: OTP_TRANSPORT
+        value: console
+      - key: OTP_TTL_SECONDS
+        value: "300"
+      - key: OTP_MAX_ATTEMPTS
+        value: "5"
+      - key: TWILIO_ACCOUNT_SID
+        sync: false
+      - key: TWILIO_AUTH_TOKEN
+        sync: false
+      - key: TWILIO_FROM_NUMBER
+        sync: false

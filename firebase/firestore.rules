@@ -1,0 +1,28 @@
+rules_version = '2';
+
+// VitalQR Firestore rules
+// ---------------------------------------------------------------------
+// Deny everything to client SDKs, on purpose.
+//
+// All reads and writes go through the Express API using the Admin SDK,
+// which bypasses these rules. That is the design: the public scan must
+// return ONLY the emergency tier, and that redaction happens server-side
+// in server/src/lib/redact.js.
+//
+// If clients could read profiles/{uid} directly, anyone holding a publicId
+// could pull the full document - medical history, insurance, address - and
+// the OTP gate would be decorative. So the rule below is the enforcement
+// point for the entire privacy model, not boilerplate.
+//
+// Deploy with:  firebase deploy --only firestore:rules
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // profiles/{uid}, publicIndex/{publicId}, users/{uid}, otpSessions/{id}
+    // and every subcollection: no direct client access.
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

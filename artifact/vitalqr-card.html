@@ -1,0 +1,1055 @@
+<title>VitalQR</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@500;600&display=swap');
+
+/* ---- tokens: light is the base, both dark states redefine only these ---- */
+:root {
+  --ground: #eef3f3;
+  --surface: #ffffff;
+  --surface-2: #f6fafa;
+  --line: #cddada;
+  --line-soft: #e2ebeb;
+  --ink: #0b1f24;
+  --ink-2: #3d565b;
+  --ink-3: #6d8489;
+  --accent: #0e7c86;
+  --accent-deep: #0a5b63;
+  --accent-wash: #e0efef;
+  --accent-line: #a8cfd1;
+  --critical: #b8261c;
+  --critical-wash: #fbeae8;
+  --critical-line: #edc0bb;
+  --warning: #8f5605;
+  --warning-wash: #faf0dd;
+  --warning-line: #e6d2ac;
+  --ok: #17705a;
+  --ok-wash: #e0efea;
+  --ok-line: #a9cfc3;
+  --shadow: 0 1px 2px rgb(11 31 36 / 0.06), 0 8px 24px -12px rgb(11 31 36 / 0.18);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) {
+    --ground: #071417;
+    --surface: #0d1f23;
+    --surface-2: #122a2f;
+    --line: #24464c;
+    --line-soft: #1a363b;
+    --ink: #e9f2f2;
+    --ink-2: #aac1c4;
+    --ink-3: #7c989d;
+    --accent: #43b7c0;
+    --accent-deep: #74d6dd;
+    --accent-wash: #0e3238;
+    --accent-line: #1d525a;
+    --critical: #ff8172;
+    --critical-wash: #391513;
+    --critical-line: #5d2721;
+    --warning: #eaa855;
+    --warning-wash: #33230b;
+    --warning-line: #543a11;
+    --ok: #5fcdaa;
+    --ok-wash: #0c2e26;
+    --ok-line: #1b4e42;
+    --shadow: 0 1px 2px rgb(0 0 0 / 0.4), 0 8px 24px -12px rgb(0 0 0 / 0.7);
+  }
+}
+
+:root[data-theme='dark'] {
+  --ground: #071417;
+  --surface: #0d1f23;
+  --surface-2: #122a2f;
+  --line: #24464c;
+  --line-soft: #1a363b;
+  --ink: #e9f2f2;
+  --ink-2: #aac1c4;
+  --ink-3: #7c989d;
+  --accent: #43b7c0;
+  --accent-deep: #74d6dd;
+  --accent-wash: #0e3238;
+  --accent-line: #1d525a;
+  --critical: #ff8172;
+  --critical-wash: #391513;
+  --critical-line: #5d2721;
+  --warning: #eaa855;
+  --warning-wash: #33230b;
+  --warning-line: #543a11;
+  --ok: #5fcdaa;
+  --ok-wash: #0c2e26;
+  --ok-line: #1b4e42;
+  --shadow: 0 1px 2px rgb(0 0 0 / 0.4), 0 8px 24px -12px rgb(0 0 0 / 0.7);
+}
+
+* { box-sizing: border-box; }
+
+body {
+  background: var(--ground);
+  color: var(--ink);
+  font-family: 'IBM Plex Sans', ui-sans-serif, system-ui, 'Segoe UI', sans-serif;
+  font-size: 15px;
+  line-height: 1.55;
+}
+
+h1, h2, h3 {
+  font-family: 'Archivo', ui-sans-serif, system-ui, sans-serif;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  text-wrap: balance;
+  margin: 0;
+}
+
+p { margin: 0; }
+
+a { color: var(--accent-deep); }
+
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+  border-radius: 3px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+}
+
+/* ---- shell ---- */
+.wrap { max-width: 860px; margin: 0 auto; padding: 0 18px 72px; }
+.scan-wrap { max-width: 620px; }
+
+.topbar {
+  position: sticky; top: 0; z-index: 10;
+  background: color-mix(in srgb, var(--ground) 88%, transparent);
+  backdrop-filter: blur(8px);
+  border-bottom: 1px solid var(--line-soft);
+}
+.topbar-in {
+  max-width: 860px; margin: 0 auto; padding: 12px 18px;
+  display: flex; align-items: center; justify-content: space-between; gap: 14px;
+}
+.brand {
+  font-family: 'Archivo', sans-serif; font-weight: 800; font-size: 18px;
+  letter-spacing: -0.03em; display: inline-flex; align-items: center; gap: 8px;
+  color: var(--ink); text-decoration: none;
+}
+.brand-mark {
+  width: 22px; height: 22px; border-radius: 5px; background: var(--accent);
+  display: grid; place-items: center; color: #fff; flex: none;
+}
+.brand-mark svg { width: 14px; height: 14px; }
+
+/* ---- demo notice: never let this page be mistaken for the secure build ---- */
+.notice {
+  display: flex; gap: 10px; align-items: flex-start;
+  background: var(--warning-wash); border: 1px solid var(--warning-line);
+  color: var(--ink); border-radius: 10px; padding: 11px 13px;
+  font-size: 13px; line-height: 1.5;
+}
+.notice svg { width: 16px; height: 16px; flex: none; margin-top: 2px; color: var(--warning); }
+.notice b { font-weight: 600; }
+
+/* ---- type ---- */
+.eyebrow {
+  font-family: 'IBM Plex Mono', ui-monospace, monospace;
+  font-size: 10.5px; font-weight: 600; letter-spacing: 0.14em;
+  text-transform: uppercase; color: var(--ink-3);
+}
+.lede { color: var(--ink-2); font-size: 16px; max-width: 60ch; }
+.mono { font-family: 'IBM Plex Mono', ui-monospace, monospace; font-variant-numeric: tabular-nums; }
+
+/* ---- controls ---- */
+.btn {
+  font: inherit; font-weight: 600; font-size: 14px;
+  border-radius: 9px; border: 1px solid transparent; padding: 10px 16px;
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  cursor: pointer; transition: background .15s, border-color .15s, color .15s;
+  text-decoration: none; white-space: nowrap;
+}
+.btn:disabled { opacity: .5; cursor: not-allowed; }
+.btn-primary { background: var(--accent); color: #fff; }
+.btn-primary:hover:not(:disabled) { background: var(--accent-deep); }
+:root[data-theme='dark'] .btn-primary, :root:not([data-theme='light']) .btn-primary { color: #04191c; }
+@media (prefers-color-scheme: light) { :root:not([data-theme='dark']) .btn-primary { color: #fff; } }
+.btn-quiet { background: var(--surface); border-color: var(--line); color: var(--ink); }
+.btn-quiet:hover:not(:disabled) { background: var(--surface-2); border-color: var(--accent-line); }
+.btn-bare { background: transparent; color: var(--ink-2); padding: 8px 10px; }
+.btn-bare:hover:not(:disabled) { background: var(--surface-2); color: var(--ink); }
+.btn-lg { padding: 13px 22px; font-size: 15px; }
+
+.field { display: grid; gap: 5px; }
+.field > span.lbl { font-size: 12.5px; font-weight: 600; color: var(--ink-2); }
+.req { color: var(--critical); }
+input[type='text'], input[type='date'], input[type='tel'], input[type='password'], select, textarea {
+  font: inherit; font-size: 14px; width: 100%;
+  background: var(--surface); color: var(--ink);
+  border: 1px solid var(--line); border-radius: 8px; padding: 9px 11px;
+}
+textarea { min-height: 72px; resize: vertical; }
+input::placeholder, textarea::placeholder { color: var(--ink-3); }
+input:focus, select:focus, textarea:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-wash); }
+select { appearance: none; background-image: linear-gradient(45deg, transparent 50%, var(--ink-3) 50%), linear-gradient(135deg, var(--ink-3) 50%, transparent 50%); background-position: calc(100% - 16px) 52%, calc(100% - 11px) 52%; background-size: 5px 5px, 5px 5px; background-repeat: no-repeat; padding-right: 32px; }
+
+/* ---- builder ---- */
+.panel {
+  background: var(--surface); border: 1px solid var(--line-soft);
+  border-radius: 13px; padding: 18px;
+}
+.panel > h3 { font-size: 15px; font-weight: 700; letter-spacing: -0.01em; }
+.panel-note { font-size: 13px; color: var(--ink-3); margin-top: 3px; }
+.grid-2 { display: grid; gap: 13px; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); }
+.grid-3 { display: grid; gap: 11px; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); }
+
+.row {
+  display: grid; grid-template-columns: 1fr auto; gap: 10px; align-items: start;
+  background: var(--surface-2); border: 1px solid var(--line-soft);
+  border-radius: 10px; padding: 11px;
+}
+.row-del {
+  background: transparent; border: 0; cursor: pointer; color: var(--ink-3);
+  padding: 6px; border-radius: 7px; display: grid; place-items: center;
+}
+.row-del:hover { background: var(--critical-wash); color: var(--critical); }
+.row-del svg { width: 16px; height: 16px; }
+.empty {
+  border: 1px dashed var(--line); border-radius: 10px; padding: 16px;
+  text-align: center; color: var(--ink-3); font-size: 13px;
+}
+
+.check { display: flex; align-items: center; gap: 9px; cursor: pointer; font-size: 14px; font-weight: 500; }
+.check input { width: 16px; height: 16px; accent-color: var(--accent); }
+
+.sticky-save {
+  position: sticky; bottom: 0; margin-top: 6px;
+  background: color-mix(in srgb, var(--ground) 90%, transparent);
+  backdrop-filter: blur(8px);
+  border-top: 1px solid var(--line-soft);
+  padding: 12px 0; display: flex; flex-wrap: wrap; gap: 10px; align-items: center;
+}
+
+/* ---- the scan card ---- */
+.card {
+  background: var(--surface); border: 1px solid var(--line);
+  border-radius: 14px; overflow: hidden; box-shadow: var(--shadow);
+}
+.card-head { display: flex; gap: 16px; align-items: center; padding: 18px; border-bottom: 1px solid var(--line-soft); }
+
+/* blood group as a wristband label: the one thing readable across a room */
+.blood {
+  flex: none; width: 96px; height: 96px; border-radius: 11px;
+  background: var(--critical); color: #fff;
+  display: grid; place-content: center; text-align: center; gap: 1px;
+  box-shadow: inset 0 -3px 0 rgb(0 0 0 / 0.16);
+}
+.blood .k { font-family: 'IBM Plex Mono', monospace; font-size: 9.5px; letter-spacing: 0.18em; opacity: .85; }
+.blood .v { font-family: 'Archivo', sans-serif; font-weight: 800; font-size: 36px; line-height: 1; letter-spacing: -0.035em; }
+.blood .v.long { font-size: 25px; }
+
+.who h1 { font-size: 25px; line-height: 1.15; }
+.chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+.chip {
+  font-size: 11.5px; font-weight: 600; border-radius: 999px;
+  padding: 2.5px 9px; border: 1px solid var(--line); color: var(--ink-2); background: var(--surface-2);
+}
+.chip-ok { background: var(--ok-wash); border-color: var(--ok-line); color: var(--ok); }
+.chip-warn { background: var(--warning-wash); border-color: var(--warning-line); color: var(--warning); }
+.chip-crit { background: var(--critical-wash); border-color: var(--critical-line); color: var(--critical); }
+
+.sect { padding: 15px 18px; border-bottom: 1px solid var(--line-soft); }
+.sect:last-child { border-bottom: 0; }
+.sect-hd { display: flex; align-items: center; gap: 7px; margin-bottom: 9px; }
+.count {
+  font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; font-weight: 600;
+  background: var(--surface-2); border: 1px solid var(--line-soft);
+  border-radius: 999px; padding: 0 6px; color: var(--ink-2);
+}
+.facts { list-style: none; margin: 0; padding: 0; display: grid; gap: 2px; }
+.facts li { padding: 6px 0 6px 12px; border-left: 3px solid var(--line-soft); }
+.facts li.sev-high { border-left-color: var(--critical); }
+.facts li.sev-mid { border-left-color: var(--warning); }
+.fact-t { font-weight: 600; font-size: 15px; }
+.fact-s { color: var(--ink-2); font-size: 13.5px; }
+.none { color: var(--ink-3); font-size: 13.5px; }
+
+/* contacts: calling is the action, so make it the button */
+.contact {
+  display: flex; flex-wrap: wrap; gap: 10px; align-items: center; justify-content: space-between;
+  padding: 10px 12px; border: 1px solid var(--line-soft); border-radius: 10px; background: var(--surface-2);
+}
+.call {
+  display: inline-flex; align-items: center; gap: 7px; text-decoration: none;
+  background: var(--ok); color: #fff; font-weight: 700; font-size: 14px;
+  padding: 9px 14px; border-radius: 9px;
+}
+:root[data-theme='dark'] .call, :root:not([data-theme='light']) .call { color: #04191c; }
+@media (prefers-color-scheme: light) { :root:not([data-theme='dark']) .call { color: #fff; } }
+.call svg { width: 15px; height: 15px; }
+
+/* decision prompts are alerts, so they are the only bordered blocks here */
+.prompt { border: 1px solid; border-radius: 10px; padding: 12px 13px; display: flex; gap: 10px; }
+.prompt svg { width: 17px; height: 17px; flex: none; margin-top: 2px; }
+.prompt .t { font-weight: 700; font-size: 14.5px; }
+.prompt .a { font-size: 14px; color: var(--ink-2); margin-top: 2px; }
+.p-crit { background: var(--critical-wash); border-color: var(--critical-line); }
+.p-crit svg, .p-crit .lvl { color: var(--critical); }
+.p-warn { background: var(--warning-wash); border-color: var(--warning-line); }
+.p-warn svg, .p-warn .lvl { color: var(--warning); }
+.p-info { background: var(--surface-2); border-color: var(--line); }
+.p-info svg, .p-info .lvl { color: var(--ink-3); }
+.lvl { font-family: 'IBM Plex Mono', monospace; font-size: 9.5px; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; }
+
+.stale { background: var(--warning-wash); border-bottom: 1px solid var(--warning-line); padding: 10px 18px; font-size: 13.5px; }
+
+.pin-in {
+  font-family: 'IBM Plex Mono', monospace; font-size: 26px; font-weight: 600;
+  text-align: center; letter-spacing: 0.42em; text-indent: 0.42em; padding: 11px;
+}
+
+.qr-box {
+  background: #fff; border: 1px solid var(--line); border-radius: 13px;
+  padding: 16px; display: grid; gap: 10px; justify-items: center;
+}
+.qr-box canvas, .qr-box img { display: block; width: 232px; height: 232px; image-rendering: pixelated; }
+.qr-cap { font-family: 'IBM Plex Mono', monospace; font-size: 10px; letter-spacing: 0.13em; text-transform: uppercase; color: #4a5b5b; text-align: center; }
+
+.meter { height: 5px; border-radius: 999px; background: var(--line-soft); overflow: hidden; }
+.meter > i { display: block; height: 100%; background: var(--accent); transition: width .2s; }
+
+.stack { display: grid; gap: 14px; }
+.stack-sm { display: grid; gap: 9px; }
+.flow { display: flex; flex-wrap: wrap; gap: 9px; }
+.hide { display: none !important; }
+
+@media print {
+  .no-print { display: none !important; }
+  body { background: #fff; }
+  .card { box-shadow: none; border-color: #0b1f24; }
+}
+</style>
+
+<div class="topbar no-print">
+  <div class="topbar-in">
+    <a class="brand" href="#/">
+      <span class="brand-mark" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M3 3h7v2H5v5H3V3Zm11 0h7v7h-2V5h-5V3ZM3 14h2v5h5v2H3v-7Zm16 0h2v7h-7v-2h5v-5Z"/></svg>
+      </span>
+      VitalQR
+    </a>
+    <nav class="flow" id="nav"></nav>
+  </div>
+</div>
+
+<main id="view" class="wrap"></main>
+
+<script src="https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.js"></script>
+<script>
+(() => {
+  'use strict';
+
+  /* =========================================================================
+     VitalQR - self-contained card
+     -------------------------------------------------------------------------
+     This build has no server. A published artifact that declares the `db`
+     capability cannot be shared publicly, and a profile nobody can open
+     without signing in defeats the entire premise, so the profile travels
+     INSIDE the QR: encoded into the URL fragment, which browsers never send
+     to any server. That makes the card work for any stranger with a camera,
+     offline, with nothing deployed.
+
+     The trade this makes, stated plainly rather than hidden: the data is
+     frozen at print time and anyone who photographs the code holds it. The
+     Express/Firebase build in this repo keeps the data server-side for
+     exactly that reason. See the note rendered on every screen.
+     ========================================================================= */
+
+  const BLOOD = ['A+','A-','B+','B-','AB+','AB-','O+','O-','Unknown'];
+  const SEV = ['mild','moderate','severe','life-threatening'];
+
+  /* ---- Emergency Decision Card rules -------------------------------------
+     Prompts and cautions only, never a dose or a prescription. Matching is
+     keyword-based and deliberately over-inclusive: a redundant warning costs
+     a second, a missed one costs more.                                      */
+  const RULES = [
+    { id:'pen', lvl:'critical', a:['penicillin','amoxicillin','ampicillin','augmentin','beta-lactam'],
+      t:'Penicillin-class allergy on file',
+      x:'Avoid penicillin-class antibiotics (amoxicillin, ampicillin, co-amoxiclav). Flag possible cephalosporin cross-reactivity to the treating clinician.' },
+    { id:'sulfa', lvl:'critical', a:['sulfa','sulphonamide','sulfonamide','cotrimoxazole','bactrim'],
+      t:'Sulfa allergy on file',
+      x:'Avoid sulfonamide antibiotics. Check any prepared medication against this allergy before administration.' },
+    { id:'nsaid', lvl:'warning', a:['aspirin','nsaid','ibuprofen','diclofenac','naproxen'],
+      t:'NSAID / aspirin allergy on file',
+      x:'Avoid NSAIDs and aspirin for pain relief. Note this before any analgesic is given.' },
+    { id:'latex', lvl:'warning', a:['latex','rubber'],
+      t:'Latex allergy on file',
+      x:'Use latex-free gloves, tourniquets, catheters and airway equipment.' },
+    { id:'contrast', lvl:'critical', a:['contrast','iodine','iodinated','gadolinium'],
+      t:'Contrast-media allergy on file',
+      x:'Inform imaging before any contrast-enhanced CT or MRI. Premedication may be required.' },
+    { id:'anaph', lvl:'critical', a:['peanut','nuts','shellfish','bee','wasp','anaphylaxis'],
+      t:'History of severe allergic reaction',
+      x:'Treat sudden collapse, wheeze, or facial or airway swelling as possible anaphylaxis. Check the patient for a carried adrenaline auto-injector.' },
+
+    { id:'dm', lvl:'critical', c:['diabetes','diabetic','t1dm','t2dm'],
+      t:'Diabetes on file',
+      x:'Check capillary blood glucose early. Do not assume altered consciousness is head injury or intoxication until hypoglycaemia is excluded.' },
+    { id:'epi', lvl:'critical', c:['epilepsy','seizure','convulsion'],
+      t:'Seizure disorder on file',
+      x:'Apply seizure precautions and protect the airway. Establish when the last anti-epileptic dose was taken; a missed dose is a common trigger.' },
+    { id:'resp', lvl:'warning', c:['asthma','copd','bronchitis'],
+      t:'Chronic respiratory condition on file',
+      x:'Treat breathlessness or wheeze as a possible exacerbation. Look for a carried inhaler; avoid known respiratory irritants.' },
+    { id:'card', lvl:'critical', c:['heart','cardiac','angina','myocardial','arrhythmia','pacemaker','stent','bypass','fibrillation'],
+      t:'Cardiac history on file',
+      x:'Obtain an early ECG. If a pacemaker or ICD is recorded, tell the team before defibrillation or MRI.' },
+    { id:'renal', lvl:'warning', c:['kidney','renal','dialysis','ckd','nephro'],
+      t:'Renal impairment on file',
+      x:'Renally-cleared drugs and contrast may need dose adjustment. Flag dialysis dependence and last session to the treating team.' },
+    { id:'preg', lvl:'critical', c:['pregnan','gravid','trimester'],
+      t:'Pregnancy recorded on profile',
+      x:'Avoid teratogenic drugs and minimise radiation exposure. Involve obstetrics early. Confirm current status, as this field may be out of date.' },
+    { id:'immuno', lvl:'warning', c:['immunocompromised','hiv','transplant','chemotherapy','leukaemia','leukemia','lymphoma'],
+      t:'Immunocompromise on file',
+      x:'Low threshold for sepsis. Use strict aseptic technique; fever may be the only sign of serious infection.' },
+    { id:'htn', lvl:'info', c:['hypertension','high blood pressure'],
+      t:'Hypertension on file',
+      x:'Interpret blood pressure against a raised baseline; a seemingly normal reading may represent relative hypotension.' },
+
+    { id:'antico', lvl:'critical', m:['warfarin','heparin','apixaban','rivaroxaban','dabigatran','clopidogrel','acenocoumarol','blood thinner'],
+      t:'On anticoagulant or antiplatelet therapy',
+      x:'High bleeding risk from apparently minor trauma. Avoid intramuscular injections. Raise the threshold for suspecting intracranial bleed after head injury; reversal may be needed.' },
+    { id:'glucose', lvl:'critical', m:['insulin','metformin','gliclazide','glicazide','glimepiride'],
+      t:'On glucose-lowering medication',
+      x:'Hypoglycaemia is a leading cause of collapse in this patient group. Check blood glucose before other investigations.' },
+    { id:'steroid', lvl:'warning', m:['prednisolone','prednisone','steroid','hydrocortisone','dexamethasone'],
+      t:'On long-term steroid therapy',
+      x:'Risk of adrenal crisis under physiological stress. Steroid cover may be required; do not stop the medication abruptly.' },
+    { id:'bb', lvl:'warning', m:['metoprolol','atenolol','propranolol','bisoprolol','carvedilol'],
+      t:'On beta-blocker therapy',
+      x:'Heart rate may stay deceptively normal despite significant shock or blood loss. Do not rely on tachycardia as a warning sign.' },
+    { id:'opioid', lvl:'warning', m:['morphine','tramadol','fentanyl','oxycodone','codeine','buprenorphine'],
+      t:'On opioid therapy',
+      x:'Consider opioid effect in any reduced consciousness or respiratory depression. Established tolerance may alter analgesic requirements.' },
+    { id:'aed', lvl:'warning', m:['levetiracetam','phenytoin','valproate','carbamazepine','lamotrigine','keppra'],
+      t:'On anti-epileptic medication',
+      x:'A missed dose is a common seizure trigger. Establish the time of the last dose and maintain the regimen where possible.' },
+
+    { id:'rh', lvl:'warning', b:['A-','B-','AB-','O-'],
+      t:'Rh-negative blood group recorded',
+      x:'Rh-negative units may be in limited supply, so alert the blood bank early. The recorded group must still be confirmed by crossmatch.' },
+    { id:'bunk', lvl:'info', b:['Unknown'],
+      t:'Blood group not recorded',
+      x:'No blood group on file. Group and crossmatch will be required before transfusion.' }
+  ];
+
+  const ORDER = { critical: 0, warning: 1, info: 2 };
+  const DISCLAIMER = 'Decision prompts are generated from user-entered data and are a decision aid only. They are not a diagnosis and do not replace clinical assessment. Blood group must be confirmed by crossmatch before transfusion.';
+
+  function hay(list, keys) {
+    return (list || []).map(o => keys.map(k => o && o[k]).filter(Boolean).join(' ')).join(' | ').toLowerCase();
+  }
+  function hit(terms, text) { return terms.some(t => text.includes(t)); }
+
+  function decisionCard(p) {
+    const A = hay(p.allergies, ['substance','reaction']);
+    const C = hay(p.conditions, ['name','notes']);
+    const M = hay(p.medications, ['name']);
+    const out = [];
+    for (const r of RULES) {
+      if ((r.a && hit(r.a, A)) || (r.c && hit(r.c, C)) || (r.m && hit(r.m, M)) || (r.b && r.b.includes(p.bloodGroup || 'Unknown'))) {
+        out.push({ id: r.id, lvl: r.lvl, t: r.t, x: r.x });
+      }
+    }
+    const severe = (p.allergies || []).filter(a => a.severity === 'severe' || a.severity === 'life-threatening');
+    if (severe.length && !out.some(o => o.id === 'anaph')) {
+      out.unshift({
+        id: 'severe', lvl: 'critical',
+        t: 'Severe allergy on file: ' + severe.map(a => a.substance).join(', '),
+        x: 'Patient has recorded a severe or life-threatening reaction to the above. Verify before administering any medication.'
+      });
+    }
+    out.sort((a, b) => ORDER[a.lvl] - ORDER[b.lvl]);
+    return out;
+  }
+
+  /* ---- payload codec -----------------------------------------------------
+     JSON -> deflate -> base64url, with a leading flag byte so a browser
+     without CompressionStream still reads cards made by one that has it.   */
+  const enc = new TextEncoder();
+  const dec = new TextDecoder();
+
+  function b64urlEncode(bytes) {
+    let s = '';
+    for (let i = 0; i < bytes.length; i += 0x8000) s += String.fromCharCode.apply(null, bytes.subarray(i, i + 0x8000));
+    return btoa(s).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+  }
+  function b64urlDecode(str) {
+    const s = str.replace(/-/g, '+').replace(/_/g, '/');
+    const bin = atob(s + '='.repeat((4 - (s.length % 4)) % 4));
+    const out = new Uint8Array(bin.length);
+    for (let i = 0; i < bin.length; i++) out[i] = bin.charCodeAt(i);
+    return out;
+  }
+  async function squeeze(bytes) {
+    if (typeof CompressionStream === 'undefined') return join(0, bytes);
+    const s = new Blob([bytes]).stream().pipeThrough(new CompressionStream('deflate-raw'));
+    return join(1, new Uint8Array(await new Response(s).arrayBuffer()));
+  }
+  async function unsqueeze(bytes) {
+    const flag = bytes[0], body = bytes.subarray(1);
+    if (flag === 0) return body;
+    if (typeof DecompressionStream === 'undefined') throw new Error('This browser cannot read compressed cards.');
+    const s = new Blob([body]).stream().pipeThrough(new DecompressionStream('deflate-raw'));
+    return new Uint8Array(await new Response(s).arrayBuffer());
+  }
+  function join(flag, bytes) {
+    const out = new Uint8Array(bytes.length + 1);
+    out[0] = flag; out.set(bytes, 1);
+    return out;
+  }
+
+  async function pack(payload) { return b64urlEncode(await squeeze(enc.encode(JSON.stringify(payload)))); }
+  async function unpack(token) { return JSON.parse(dec.decode(await unsqueeze(b64urlDecode(token)))); }
+
+  /* ---- protected tier ----------------------------------------------------
+     AES-GCM with a PBKDF2-stretched PIN. A real cryptographic gate, not a
+     hidden div - but a 6-digit PIN is brute-forceable offline by anyone
+     holding the card, which is precisely why the production build keeps this
+     tier on the server instead. Said out loud in the UI.                    */
+  async function keyFrom(pin, salt) {
+    const base = await crypto.subtle.importKey('raw', enc.encode(pin), 'PBKDF2', false, ['deriveKey']);
+    return crypto.subtle.deriveKey(
+      { name: 'PBKDF2', salt, iterations: 310000, hash: 'SHA-256' },
+      base, { name: 'AES-GCM', length: 256 }, false, ['encrypt', 'decrypt']
+    );
+  }
+  async function seal(obj, pin) {
+    const salt = crypto.getRandomValues(new Uint8Array(16));
+    const iv = crypto.getRandomValues(new Uint8Array(12));
+    const key = await keyFrom(pin, salt);
+    const ct = new Uint8Array(await crypto.subtle.encrypt({ name: 'AES-GCM', iv }, key, enc.encode(JSON.stringify(obj))));
+    return { s: b64urlEncode(salt), i: b64urlEncode(iv), c: b64urlEncode(ct) };
+  }
+  async function unseal(blob, pin) {
+    const key = await keyFrom(pin, b64urlDecode(blob.s));
+    const pt = await crypto.subtle.decrypt({ name: 'AES-GCM', iv: b64urlDecode(blob.i) }, key, b64urlDecode(blob.c));
+    return JSON.parse(dec.decode(new Uint8Array(pt)));
+  }
+
+  /* ---- helpers ---- */
+  const $ = (sel, root) => (root || document).querySelector(sel);
+  const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c]));
+  const el = html => { const t = document.createElement('template'); t.innerHTML = html.trim(); return t.content.firstElementChild; };
+
+  function ageFrom(dob) {
+    if (!dob) return null;
+    const d = new Date(dob);
+    if (isNaN(d)) return null;
+    const n = new Date();
+    let a = n.getFullYear() - d.getFullYear();
+    const m = n.getMonth() - d.getMonth();
+    if (m < 0 || (m === 0 && n.getDate() < d.getDate())) a--;
+    return a >= 0 && a < 130 ? a : null;
+  }
+  function ago(iso) {
+    if (!iso) return 'unknown';
+    const days = Math.floor((Date.now() - new Date(iso)) / 86400000);
+    if (days < 1) return 'today';
+    if (days === 1) return 'yesterday';
+    if (days < 30) return days + ' days ago';
+    const mo = Math.floor(days / 30);
+    if (mo < 12) return mo + (mo === 1 ? ' month ago' : ' months ago');
+    const y = Math.floor(mo / 12);
+    return y + (y === 1 ? ' year ago' : ' years ago');
+  }
+  const stale = iso => !iso || (Date.now() - new Date(iso)) > 365 * 86400000;
+
+  const ICON = {
+    crit: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2 1 21h22L12 2Zm0 6 1 7h-2l1-7Zm0 9.5a1.25 1.25 0 1 1 0 2.5 1.25 1.25 0 0 1 0-2.5Z"/></svg>',
+    warn: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20Zm1 15h-2v-2h2v2Zm0-4h-2V7h2v6Z"/></svg>',
+    info: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20Zm1 15h-2v-6h2v6Zm0-8h-2V7h2v2Z"/></svg>',
+    trash: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M9 3h6l1 2h4v2H4V5h4l1-2ZM6 9h12l-1 12H7L6 9Z"/></svg>',
+    phone: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M6.6 10.8a15.1 15.1 0 0 0 6.6 6.6l2.2-2.2a1 1 0 0 1 1-.25 11.4 11.4 0 0 0 3.6.57 1 1 0 0 1 1 1V20a1 1 0 0 1-1 1A17 17 0 0 1 3 4a1 1 0 0 1 1-1h3.5a1 1 0 0 1 1 1c0 1.25.2 2.45.57 3.6a1 1 0 0 1-.25 1l-2.22 2.2Z"/></svg>',
+    lock: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 1a5 5 0 0 1 5 5v3h1a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V11a2 2 0 0 1 2-2h1V6a5 5 0 0 1 5-5Zm3 8V6a3 3 0 1 0-6 0v3h6Z"/></svg>',
+    plus: '<svg viewBox="0 0 24 24" fill="currentColor" width="14" height="14"><path d="M11 5h2v6h6v2h-6v6h-2v-6H5v-2h6V5Z"/></svg>'
+  };
+
+  const DEMO_NOTE = 'This card is a prototype. Everything it shows lives inside the QR code itself, so anyone who photographs the code can read the emergency details. Do not put a real medical record in it.';
+
+  function noticeEl(extra) {
+    return '<div class="notice no-print">' + ICON.warn.replace('<svg', '<svg aria-hidden="true"') +
+      '<div><b>Prototype, not a medical record.</b> ' + esc(DEMO_NOTE) + (extra ? ' ' + extra : '') + '</div></div>';
+  }
+
+  /* ---- draft state ---- */
+  const EXAMPLE = {
+    fullName: 'Aarav Sharma',
+    bloodGroup: 'O-',
+    dateOfBirth: '1991-04-17',
+    organDonor: true,
+    allergies: [
+      { substance: 'Penicillin', reaction: 'Anaphylaxis', severity: 'life-threatening' },
+      { substance: 'Peanuts', reaction: 'Swelling, breathlessness', severity: 'severe' }
+    ],
+    conditions: [
+      { name: 'Type 1 diabetes', notes: 'Insulin dependent since 2009' },
+      { name: 'Atrial fibrillation', notes: 'On long-term anticoagulation' }
+    ],
+    medications: [
+      { name: 'Insulin glargine', dose: '18 units', frequency: 'At night' },
+      { name: 'Warfarin', dose: '5 mg', frequency: 'Once daily' }
+    ],
+    contacts: [
+      { name: 'Priya Sharma', relation: 'Wife', phone: '+91 98765 43210' },
+      { name: 'Rohan Sharma', relation: 'Brother', phone: '+91 91234 56780' }
+    ],
+    notes: 'Carries an insulin pen and glucose gel in his backpack.',
+    protectedTier: {
+      history: 'Diabetic ketoacidosis 2018, admitted 4 days. Atrial fibrillation diagnosed 2019.',
+      surgeries: 'Appendectomy, 2012',
+      physician: 'Dr. Meera Iyer, City General Hospital, Bhopal',
+      insurance: 'Star Health, policy SH-4471-2290',
+      address: '12 Rose Villa, Kolar Road, Bhopal'
+    },
+    pin: '',
+    updatedAt: new Date().toISOString()
+  };
+
+  let draft = load() || JSON.parse(JSON.stringify(EXAMPLE));
+  let usingExample = !load();
+
+  function load() {
+    try { const r = localStorage.getItem('vitalqr.draft'); return r ? JSON.parse(r) : null; } catch { return null; }
+  }
+  function save() {
+    draft.updatedAt = new Date().toISOString();
+    try { localStorage.setItem('vitalqr.draft', JSON.stringify(draft)); } catch {}
+    usingExample = false;
+  }
+
+  /* ---- rendering: builder ---- */
+  const view = $('#view');
+
+  function renderNav() {
+    const r = location.hash.slice(1) || '/';
+    const scanning = r.startsWith('/s/');
+    $('#nav').innerHTML = scanning
+      ? '<a class="btn btn-quiet" href="#/">Build a card</a>'
+      : '<a class="btn btn-bare" href="#/">Details</a><a class="btn btn-quiet" href="#/card">My QR card</a>';
+  }
+
+  function listBlock(key, cfg) {
+    const items = draft[key] || [];
+    const rows = items.map((it, i) => '<div class="row" data-i="' + i + '">' +
+      '<div class="grid-3">' + cfg.fields.map(f => fieldHtml(f, it, key, i)).join('') + '</div>' +
+      '<button class="row-del" type="button" data-del="' + key + '" data-i="' + i + '" aria-label="Remove ' + esc(cfg.one) + ' ' + (i + 1) + '">' + ICON.trash + '</button>' +
+      '</div>').join('');
+    return '<div class="stack-sm" data-list="' + key + '">' +
+      (items.length ? rows : '<p class="empty">No ' + esc(cfg.plural) + ' added.</p>') +
+      '</div><button class="btn btn-quiet btn-sm" type="button" data-add="' + key + '" style="margin-top:9px;padding:7px 12px;font-size:13px">' + ICON.plus + ' Add ' + esc(cfg.one) + '</button>';
+  }
+
+  function fieldHtml(f, it, key, i) {
+    const v = it[f.k] == null ? '' : it[f.k];
+    const id = key + '.' + i + '.' + f.k;
+    if (f.opts) {
+      return '<label class="field"><span class="lbl">' + esc(f.label) + '</span><select data-bind="' + id + '">' +
+        f.opts.map(o => '<option value="' + esc(o) + '"' + (o === v ? ' selected' : '') + '>' + esc(o) + '</option>').join('') +
+        '</select></label>';
+    }
+    return '<label class="field"><span class="lbl">' + esc(f.label) + (f.req ? ' <span class="req">*</span>' : '') + '</span>' +
+      '<input type="' + (f.type || 'text') + '" data-bind="' + id + '" value="' + esc(v) + '" placeholder="' + esc(f.ph || '') + '"></label>';
+  }
+
+  const LISTS = {
+    allergies: { one: 'allergy', plural: 'allergies', fields: [
+      { k: 'substance', label: 'Allergen', req: true, ph: 'Penicillin' },
+      { k: 'reaction', label: 'Reaction', ph: 'Anaphylaxis' },
+      { k: 'severity', label: 'Severity', opts: SEV } ] },
+    conditions: { one: 'condition', plural: 'conditions', fields: [
+      { k: 'name', label: 'Condition', req: true, ph: 'Type 1 diabetes' },
+      { k: 'notes', label: 'Notes', ph: 'Anything a responder should know' } ] },
+    medications: { one: 'medication', plural: 'medications', fields: [
+      { k: 'name', label: 'Medication', req: true, ph: 'Warfarin' },
+      { k: 'dose', label: 'Dose', ph: '5 mg' },
+      { k: 'frequency', label: 'Frequency', ph: 'Once daily' } ] },
+    contacts: { one: 'contact', plural: 'contacts', fields: [
+      { k: 'name', label: 'Name', req: true, ph: 'Priya Sharma' },
+      { k: 'relation', label: 'Relationship', ph: 'Wife' },
+      { k: 'phone', label: 'Phone', type: 'tel', req: true, ph: '+91 98765 43210' } ] }
+  };
+
+  function builder() {
+    const p = draft;
+    view.className = 'wrap';
+    view.innerHTML =
+      '<div class="stack" style="padding-top:22px">' +
+        '<div class="stack-sm">' +
+          '<p class="eyebrow">Emergency medical card</p>' +
+          '<h1 style="font-size:31px">Your medical history, one scan away</h1>' +
+          '<p class="lede">Fill this in once. VitalQR turns it into a QR code you can print, wear or keep on a lock screen - and any phone camera opens it, with no app and no login.</p>' +
+        '</div>' +
+        noticeEl() +
+        (usingExample ? '<div class="notice no-print" style="background:var(--accent-wash);border-color:var(--accent-line)">' + ICON.info + '<div>Loaded with <b>example data</b> so you can see how a finished card reads. Replace it with your own, or clear it and start blank.</div></div>' : '') +
+
+        '<section class="panel"><h3>Identity and blood group</h3>' +
+          '<div class="grid-2" style="margin-top:13px">' +
+            '<label class="field"><span class="lbl">Full name <span class="req">*</span></span><input type="text" data-bind="fullName" value="' + esc(p.fullName) + '" placeholder="As a responder should read it"></label>' +
+            '<label class="field"><span class="lbl">Blood group</span><select data-bind="bloodGroup">' + BLOOD.map(b => '<option' + (b === p.bloodGroup ? ' selected' : '') + '>' + b + '</option>').join('') + '</select></label>' +
+            '<label class="field"><span class="lbl">Date of birth</span><input type="date" data-bind="dateOfBirth" value="' + esc(p.dateOfBirth) + '"><span style="font-size:12px;color:var(--ink-3)">Only your age appears on the card, never the full date.</span></label>' +
+            '<label class="check" style="align-self:end;padding-bottom:7px"><input type="checkbox" data-bind="organDonor"' + (p.organDonor ? ' checked' : '') + '> Registered organ donor</label>' +
+          '</div></section>' +
+
+        '<section class="panel"><h3>Allergies</h3><p class="panel-note">The most acted-on field in an emergency. Include drug, food and material allergies.</p><div style="margin-top:13px">' + listBlock('allergies', LISTS.allergies) + '</div></section>' +
+        '<section class="panel"><h3>Chronic conditions</h3><div style="margin-top:13px">' + listBlock('conditions', LISTS.conditions) + '</div></section>' +
+        '<section class="panel"><h3>Current medications</h3><div style="margin-top:13px">' + listBlock('medications', LISTS.medications) + '</div></section>' +
+        '<section class="panel"><h3>Emergency contacts</h3><p class="panel-note">Shown in full on the card, so a responder can call straight away.</p><div style="margin-top:13px">' + listBlock('contacts', LISTS.contacts) + '</div></section>' +
+
+        '<section class="panel"><h3>Additional notes</h3><div style="margin-top:11px"><textarea data-bind="notes" placeholder="e.g. Hearing impaired, communicates by writing">' + esc(p.notes) + '</textarea></div></section>' +
+
+        '<section class="panel"><h3>Protected details</h3>' +
+          '<p class="panel-note">Encrypted into the card with a PIN and hidden until someone enters it. Leave the PIN blank to leave this section out entirely.</p>' +
+          '<div class="stack-sm" style="margin-top:13px">' +
+            '<label class="field"><span class="lbl">Medical history</span><textarea data-bind="protectedTier.history" placeholder="Past admissions, diagnoses">' + esc(p.protectedTier.history) + '</textarea></label>' +
+            '<div class="grid-2">' +
+              '<label class="field"><span class="lbl">Past surgeries</span><input type="text" data-bind="protectedTier.surgeries" value="' + esc(p.protectedTier.surgeries) + '"></label>' +
+              '<label class="field"><span class="lbl">Primary physician</span><input type="text" data-bind="protectedTier.physician" value="' + esc(p.protectedTier.physician) + '"></label>' +
+              '<label class="field"><span class="lbl">Insurance</span><input type="text" data-bind="protectedTier.insurance" value="' + esc(p.protectedTier.insurance) + '"></label>' +
+              '<label class="field"><span class="lbl">Home address</span><input type="text" data-bind="protectedTier.address" value="' + esc(p.protectedTier.address) + '"></label>' +
+            '</div>' +
+            '<label class="field" style="max-width:220px"><span class="lbl">Unlock PIN</span><input type="text" inputmode="numeric" maxlength="8" data-bind="pin" value="' + esc(p.pin) + '" placeholder="6 digits" class="mono"></label>' +
+            '<div class="notice" style="background:var(--surface-2);border-color:var(--line)">' + ICON.info + '<div>A short PIN can be guessed offline by anyone holding the card, because the encrypted text travels in the code. Treat this as a demonstration of the flow; the server build keeps these fields off the card entirely and releases them only after a one-time code sent to your emergency contact.</div></div>' +
+          '</div></section>' +
+
+        '<div class="sticky-save no-print">' +
+          '<a class="btn btn-primary btn-lg" href="#/card">Generate my QR card</a>' +
+          '<button class="btn btn-bare" type="button" id="clear">Clear and start blank</button>' +
+        '</div>' +
+      '</div>';
+
+    wireBuilder();
+  }
+
+  // Delegated once on the container, which survives every re-render. Binding
+  // inside wireBuilder would stack a fresh listener on each redraw.
+  view.addEventListener('input', onBind);
+  view.addEventListener('change', onBind);
+
+  function wireBuilder() {
+    view.querySelectorAll('[data-add]').forEach(b => b.addEventListener('click', () => {
+      const k = b.dataset.add;
+      const blank = {};
+      LISTS[k].fields.forEach(f => { blank[f.k] = f.opts ? f.opts[1] || f.opts[0] : ''; });
+      draft[k] = (draft[k] || []).concat([blank]);
+      save(); builder();
+    }));
+
+    view.querySelectorAll('[data-del]').forEach(b => b.addEventListener('click', () => {
+      const k = b.dataset.del, i = +b.dataset.i;
+      draft[k] = draft[k].filter((_, n) => n !== i);
+      save(); builder();
+    }));
+
+    const clear = $('#clear');
+    if (clear) clear.addEventListener('click', () => {
+      if (!confirm('Clear every field and start from blank?')) return;
+      draft = { fullName:'', bloodGroup:'Unknown', dateOfBirth:'', organDonor:false,
+        allergies:[], conditions:[], medications:[], contacts:[{name:'',relation:'',phone:''}], notes:'',
+        protectedTier:{history:'',surgeries:'',physician:'',insurance:'',address:''}, pin:'', updatedAt:new Date().toISOString() };
+      save(); builder();
+    });
+  }
+
+  function onBind(e) {
+    const t = e.target;
+    const path = t.dataset && t.dataset.bind;
+    if (!path) return;
+    const val = t.type === 'checkbox' ? t.checked : t.value;
+    const parts = path.split('.');
+    let node = draft;
+    for (let i = 0; i < parts.length - 1; i++) {
+      const key = parts[i];
+      node = node[/^\d+$/.test(key) ? +key : key];
+      if (!node) return;
+    }
+    node[parts[parts.length - 1]] = val;
+    save();
+  }
+
+  /* ---- QR drawing -------------------------------------------------------
+     qrcode-generator hands back a module matrix; we paint it onto a canvas
+     ourselves so the code stays crisp at print size and so the same canvas
+     can produce a real PNG for download. Error correction starts at M and
+     drops to L only if the payload will not otherwise fit.                  */
+  function makeQr(text, px) {
+    for (const lvl of ['M', 'L']) {
+      try {
+        const qr = qrcode(0, lvl);
+        qr.addData(text);
+        qr.make();
+        const n = qr.getModuleCount();
+        const quiet = 4;
+        const total = n + quiet * 2;
+        const scale = Math.max(2, Math.floor((px || 900) / total));
+        const size = total * scale;
+        const c = document.createElement('canvas');
+        c.width = c.height = size;
+        const g = c.getContext('2d');
+        g.fillStyle = '#ffffff';
+        g.fillRect(0, 0, size, size);
+        g.fillStyle = '#0b1f24';
+        for (let r = 0; r < n; r++) {
+          for (let col = 0; col < n; col++) {
+            if (qr.isDark(r, col)) g.fillRect((col + quiet) * scale, (r + quiet) * scale, scale, scale);
+          }
+        }
+        return { canvas: c, level: lvl, modules: n };
+      } catch (err) { /* payload too long at this level; try the next */ }
+    }
+    return null;
+  }
+
+  /* ---- rendering: QR card ---- */
+  async function cardPage() {
+    view.className = 'wrap';
+    view.innerHTML = '<div class="stack" style="padding-top:22px"><p class="eyebrow">Step 2</p><h1 style="font-size:27px">Your QR card</h1><p class="lede">Building the code…</p></div>';
+
+    const missing = [];
+    if (!draft.fullName.trim()) missing.push('a full name');
+    if (!(draft.contacts || []).some(c => c.name.trim() && c.phone.trim())) missing.push('one emergency contact with a phone number');
+    if (missing.length) {
+      view.innerHTML = '<div class="stack" style="padding-top:22px">' + noticeEl() +
+        '<section class="panel"><h3>Almost there</h3><p class="panel-note">Add ' + esc(missing.join(' and ')) + ' before generating the card.</p>' +
+        '<div style="margin-top:14px"><a class="btn btn-primary" href="#/">Back to details</a></div></section></div>';
+      return;
+    }
+
+    const emergency = {
+      n: draft.fullName, b: draft.bloodGroup, d: draft.dateOfBirth, o: !!draft.organDonor,
+      al: (draft.allergies || []).filter(a => a.substance.trim()),
+      cd: (draft.conditions || []).filter(c => c.name.trim()),
+      md: (draft.medications || []).filter(m => m.name.trim()),
+      ct: (draft.contacts || []).filter(c => c.name.trim() && c.phone.trim()),
+      nt: draft.notes, u: draft.updatedAt
+    };
+
+    const pin = (draft.pin || '').trim();
+    const pt = draft.protectedTier || {};
+    const hasProtected = pin.length >= 4 && Object.values(pt).some(v => String(v || '').trim());
+    const payload = { v: 1, e: emergency, p: hasProtected ? await seal(pt, pin) : null };
+
+    const token = await pack(payload);
+    const base = location.href.split('#')[0];
+    const url = base + '#/s/' + token;
+    const bytes = url.length;
+    const tight = bytes > 1800;
+
+    view.innerHTML =
+      '<div class="stack" style="padding-top:22px">' +
+        '<div class="stack-sm"><p class="eyebrow">Step 2</p><h1 style="font-size:27px">Your QR card</h1>' +
+        '<p class="lede">Print it, wear it, or set it as a lock-screen image. Any camera opens the emergency view.</p></div>' +
+        noticeEl() +
+        '<div style="display:grid;gap:16px;grid-template-columns:repeat(auto-fit,minmax(264px,1fr));align-items:start">' +
+          '<div class="qr-box"><div id="qrslot"></div><p class="qr-cap">Scan for emergency medical info</p></div>' +
+          '<div class="stack">' +
+            '<section class="panel"><h3>Save it</h3>' +
+              '<div class="flow" style="margin-top:12px">' +
+                '<button class="btn btn-primary" id="dl">Download PNG</button>' +
+                '<button class="btn btn-quiet" id="prt">Print card</button>' +
+                '<button class="btn btn-quiet" id="cpy">Copy link</button>' +
+              '</div>' +
+              '<p class="panel-note" style="margin-top:11px">On a phone you can also press and hold the code to save it to your photos.</p>' +
+            '</section>' +
+            '<section class="panel"><h3>Check it before you print</h3>' +
+              '<p class="panel-note">Open the card yourself first. It should show exactly what a stranger would see.</p>' +
+              '<div class="flow" style="margin-top:12px"><a class="btn btn-quiet" href="#/s/' + token + '">Open my card</a><a class="btn btn-bare" href="#/">Edit details</a></div>' +
+            '</section>' +
+            '<section class="panel"><h3>Capacity</h3>' +
+              '<div class="meter" style="margin-top:10px"><i style="width:' + Math.min(100, Math.round(bytes / 2300 * 100)) + '%;background:' + (tight ? 'var(--warning)' : 'var(--accent)') + '"></i></div>' +
+              '<p class="panel-note" style="margin-top:8px"><span class="mono">' + bytes + '</span> characters of about 2,300. ' +
+              (tight ? 'Getting dense - the printed code will need to be larger or it may not scan. Trim older conditions or the protected section.' : 'Comfortable. The code will stay easy to scan at card size.') + '</p>' +
+            '</section>' +
+            (hasProtected ? '<section class="panel"><h3>Protected section</h3><p class="panel-note">Locked with your PIN. Anyone scanning sees the emergency details immediately; these extra fields stay encrypted until the PIN is entered.</p></section>' : '') +
+          '</div>' +
+        '</div>' +
+      '</div>';
+
+    const slot = $('#qrslot');
+    const qr = typeof qrcode === 'function' ? makeQr(url, 900) : null;
+    if (qr) {
+      qr.canvas.setAttribute('role', 'img');
+      qr.canvas.setAttribute('aria-label', 'QR code opening ' + draft.fullName + "'s emergency medical card");
+      slot.replaceChildren(qr.canvas);
+    } else {
+      slot.replaceChildren(el('<p class="none" style="max-width:232px;text-align:center">The code could not be drawn. There is more detail here than a QR code holds - remove a few entries, or clear the protected section, and try again.</p>'));
+    }
+
+    $('#prt').addEventListener('click', () => window.print());
+    $('#cpy').addEventListener('click', async e => {
+      try { await navigator.clipboard.writeText(url); e.target.textContent = 'Copied'; setTimeout(() => { e.target.textContent = 'Copy link'; }, 1600); }
+      catch { prompt('Copy this link:', url); }
+    });
+    $('#dl').addEventListener('click', async e => {
+      if (!qr) return;
+      const btn = e.target;
+      const blob = await new Promise(res => qr.canvas.toBlob(res, 'image/png'));
+      const name = 'vitalqr-' + draft.fullName.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') + '.png';
+      // Outside the artifact viewer (a local file, a plain static host) there
+      // is no `claude` at all, so this must not throw there.
+      const dls = typeof claude !== 'undefined' && claude.use ? await claude.use('downloads') : null;
+      if (!dls) { btn.textContent = 'Press and hold the code to save'; return; }
+      try { await dls.save({ filename: name, data: blob }); btn.textContent = 'Saved'; }
+      catch (err) { btn.textContent = err && err.code === 'declined' ? 'Download PNG' : 'Could not save - press and hold the code'; }
+      setTimeout(() => { btn.textContent = 'Download PNG'; }, 2200);
+    });
+  }
+
+  /* ---- rendering: the scan view ---- */
+  async function scanPage(token) {
+    view.className = 'wrap scan-wrap';
+    view.innerHTML = '<p class="lede" style="padding-top:30px">Opening emergency profile…</p>';
+
+    let payload;
+    try { payload = await unpack(token); }
+    catch {
+      view.innerHTML = '<div style="padding-top:30px" class="stack">' +
+        '<section class="panel"><h3>This card could not be read</h3>' +
+        '<p class="panel-note">The code may be damaged, incomplete, or not a VitalQR card. In an emergency, call your local emergency number now.</p></section></div>';
+      return;
+    }
+
+    const e = payload.e || {};
+    const age = ageFrom(e.d);
+    const prompts = decisionCard({ bloodGroup: e.b, allergies: e.al, conditions: e.cd, medications: e.md });
+    const old = stale(e.u);
+    const bg = e.b || 'Unknown';
+
+    const sevClass = s => (s === 'severe' || s === 'life-threatening') ? 'sev-high' : (s === 'moderate' ? 'sev-mid' : '');
+    const chipFor = s => (s === 'severe' || s === 'life-threatening') ? 'chip-crit' : (s === 'moderate' ? 'chip-warn' : '');
+
+    const section = (title, items, render) =>
+      '<div class="sect"><div class="sect-hd"><span class="eyebrow">' + esc(title) + '</span>' +
+      (items.length ? '<span class="count">' + items.length + '</span>' : '') + '</div>' +
+      (items.length ? '<ul class="facts">' + items.map(render).join('') + '</ul>' : '<p class="none">None recorded</p>') + '</div>';
+
+    view.innerHTML =
+      '<div class="stack" style="padding-top:18px">' +
+        '<article class="card">' +
+          '<div class="card-head">' +
+            '<div class="blood"><span class="k">BLOOD</span><span class="v' + (bg.length > 2 ? ' long' : '') + '">' + esc(bg === 'Unknown' ? '?' : bg) + '</span></div>' +
+            '<div class="who"><h1>' + esc(e.n || 'Unnamed profile') + '</h1><div class="chips">' +
+              (age != null ? '<span class="chip">' + age + ' years</span>' : '') +
+              (e.o ? '<span class="chip chip-ok">Organ donor</span>' : '') +
+              '<span class="chip' + (old ? ' chip-warn' : '') + '">Updated ' + esc(ago(e.u)) + '</span>' +
+            '</div></div>' +
+          '</div>' +
+
+          (old ? '<div class="stale"><b>Not updated in over a year.</b> Treat these details as unverified and confirm clinically where possible.</div>' : '') +
+
+          section('Allergies', e.al || [], a =>
+            '<li class="' + sevClass(a.severity) + '"><span class="fact-t">' + esc(a.substance) + '</span> ' +
+            '<span class="chip ' + chipFor(a.severity) + '" style="vertical-align:1px">' + esc(a.severity || 'moderate') + '</span>' +
+            (a.reaction ? '<div class="fact-s">' + esc(a.reaction) + '</div>' : '') + '</li>') +
+
+          section('Chronic conditions', e.cd || [], c =>
+            '<li><span class="fact-t">' + esc(c.name) + '</span>' + (c.notes ? '<div class="fact-s">' + esc(c.notes) + '</div>' : '') + '</li>') +
+
+          section('Current medications', e.md || [], m =>
+            '<li><span class="fact-t">' + esc(m.name) + '</span>' +
+            ((m.dose || m.frequency) ? '<div class="fact-s">' + esc([m.dose, m.frequency].filter(Boolean).join(' · ')) + '</div>' : '') + '</li>') +
+
+          (e.nt ? '<div class="sect"><div class="sect-hd"><span class="eyebrow">Additional notes</span></div><p style="font-size:15px">' + esc(e.nt) + '</p></div>' : '') +
+
+          '<div class="sect"><div class="sect-hd"><span class="eyebrow">Emergency contacts</span></div><div class="stack-sm">' +
+            ((e.ct || []).length ? (e.ct || []).map(c =>
+              '<div class="contact"><div><div class="fact-t">' + esc(c.name) + '</div>' +
+              (c.relation ? '<div class="fact-s">' + esc(c.relation) + '</div>' : '') + '</div>' +
+              '<a class="call" href="tel:' + esc(String(c.phone).replace(/\s/g, '')) + '">' + ICON.phone + esc(c.phone) + '</a></div>').join('')
+              : '<p class="none">No contact recorded</p>') +
+          '</div></div>' +
+
+          '<div class="sect"><div class="sect-hd"><span class="eyebrow">Emergency Decision Card</span></div>' +
+            '<div class="stack-sm">' +
+              (prompts.length ? prompts.map(p => {
+                const cls = p.lvl === 'critical' ? 'p-crit' : p.lvl === 'warning' ? 'p-warn' : 'p-info';
+                const ic = p.lvl === 'critical' ? ICON.crit : p.lvl === 'warning' ? ICON.warn : ICON.info;
+                const label = p.lvl === 'critical' ? 'Critical' : p.lvl === 'warning' ? 'Caution' : 'Note';
+                return '<div class="prompt ' + cls + '">' + ic + '<div><span class="lvl">' + label + '</span>' +
+                  '<div class="t">' + esc(p.t) + '</div><div class="a">' + esc(p.x) + '</div></div></div>';
+              }).join('') : '<p class="none">No automatic prompts from this profile. Read the facts above directly.</p>') +
+              '<p style="font-size:12.5px;color:var(--ink-3);line-height:1.5">' + esc(DISCLAIMER) + '</p>' +
+            '</div></div>' +
+        '</article>' +
+
+        (payload.p ? '<section class="panel no-print" id="lockbox"></section>' : '') +
+
+        '<div class="flow no-print" style="justify-content:space-between;align-items:center">' +
+          '<button class="btn btn-quiet" id="prt2">Print fallback card</button>' +
+          '<a class="btn btn-bare" href="#/">Make my own</a>' +
+        '</div>' +
+        noticeEl() +
+      '</div>';
+
+    $('#prt2').addEventListener('click', () => window.print());
+    if (payload.p) wireLock(payload.p);
+  }
+
+  function wireLock(blob) {
+    const box = $('#lockbox');
+    let tries = 0;
+
+    function ask(msg) {
+      box.innerHTML =
+        '<div class="sect-hd" style="margin:0 0 6px">' + ICON.lock + '<span class="eyebrow" style="margin-left:6px">Protected details</span></div>' +
+        '<p class="panel-note">These fields are encrypted inside the card. Ask the patient or the emergency contact above for the unlock PIN.</p>' +
+        '<div class="stack-sm" style="margin-top:13px;max-width:260px">' +
+          '<input type="password" inputmode="numeric" maxlength="8" class="pin-in" id="pin" aria-label="Unlock PIN" autocomplete="off">' +
+          '<button class="btn btn-primary" id="go">Unlock</button>' +
+        '</div>' +
+        (msg ? '<p style="margin-top:11px;font-size:13px;color:var(--critical);font-weight:600">' + esc(msg) + '</p>' : '');
+
+      $('#go').addEventListener('click', attempt);
+      $('#pin').addEventListener('keydown', ev => { if (ev.key === 'Enter') attempt(); });
+      $('#pin').focus();
+    }
+
+    async function attempt() {
+      const pin = $('#pin').value.trim();
+      if (!pin) return;
+      const btn = $('#go');
+      btn.disabled = true; btn.textContent = 'Checking…';
+      try {
+        const data = await unseal(blob, pin);
+        show(data);
+      } catch {
+        tries++;
+        ask(tries >= 3 ? 'Still not right. The emergency details above stay available without a PIN.' : 'That PIN did not unlock the card.');
+      }
+    }
+
+    function show(d) {
+      const row = (k, v) => v && String(v).trim()
+        ? '<div><span class="eyebrow">' + esc(k) + '</span><p style="font-size:15px;margin-top:3px">' + esc(v) + '</p></div>' : '';
+      box.innerHTML =
+        '<div class="sect-hd" style="margin:0 0 12px">' + ICON.lock + '<span class="eyebrow" style="margin-left:6px">Protected details</span>' +
+        '<span class="chip chip-ok">Unlocked</span></div>' +
+        '<div class="stack-sm">' +
+          row('Medical history', d.history) + row('Past surgeries', d.surgeries) +
+          row('Primary physician', d.physician) + row('Insurance', d.insurance) + row('Home address', d.address) +
+        '</div>';
+    }
+
+    ask('');
+  }
+
+  /* ---- router ---- */
+  function route() {
+    const h = location.hash.slice(1) || '/';
+    renderNav();
+    window.scrollTo(0, 0);
+    if (h.startsWith('/s/')) return scanPage(h.slice(3));
+    if (h === '/card') return cardPage();
+    return builder();
+  }
+
+  window.addEventListener('hashchange', route);
+  route();
+})();
+</script>
