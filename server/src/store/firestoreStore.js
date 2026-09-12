@@ -23,6 +23,10 @@ let dbInstance = null;
 function db() {
   if (!dbInstance) {
     dbInstance = getFirestore(getFirebaseApp());
+    // firebase-admin throws on an undefined field value rather than skipping
+    // it. An optional profile field that arrives undefined would take down the
+    // whole save, so drop those instead. Must run before the first operation.
+    dbInstance.settings({ ignoreUndefinedProperties: true });
   }
   return dbInstance;
 }
@@ -81,7 +85,13 @@ export const firestoreStore = {
       await ref.set(patch, { merge: true });
     } else {
       const publicId = newPublicId();
-      await ref.set({
+
+      // Both writes or neither. Two sequential sets could leave a profile with
+      // no publicIndex entry if the second failed, and the owner's QR code
+      // would then resolve to "no profile linked to this code" forever, with
+      // nothing in the UI to explain why.
+      const batch = db().batch();
+      batch.set(ref, {
         uid,
         publicId,
         emergency: emergency || {},
@@ -89,7 +99,8 @@ export const firestoreStore = {
         createdAt: now,
         updatedAt: now,
       });
-      await db().collection('publicIndex').doc(publicId).set({ uid, createdAt: now });
+      batch.set(db().collection('publicIndex').doc(publicId), { uid, createdAt: now });
+      await batch.commit();
     }
 
     return (await ref.get()).data();
